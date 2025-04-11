@@ -47,14 +47,6 @@ function createEnhancedBondVisualization(container, element1, element2) {
   title.textContent = getBondTitle(bondClass);
   visualization.appendChild(title);
   
-  // Create molecular visualization
-  const molecularView = document.createElement('div');
-  molecularView.className = 'molecular-view';
-  
-  // Create molecule with bond
-  createMoleculeVisualization(molecularView, lessEN, moreEN, bondClass, enDiff);
-  visualization.appendChild(molecularView);
-  
   // Create bond diagram
   const diagram = document.createElement('div');
   diagram.className = `bond-diagram ${bondClass}`;
@@ -82,59 +74,6 @@ function createEnhancedBondVisualization(container, element1, element2) {
   setTimeout(() => {
     initializeBondAnimations(bondClass);
   }, 100);
-}
-
-// Create a visualization of the molecule with bonded atoms
-function createMoleculeVisualization(container, lessEN, moreEN, bondClass, enDiff) {
-  const moleculeContainer = document.createElement('div');
-  moleculeContainer.className = 'molecule-container';
-  
-  // Create left atom
-  const leftAtom = document.createElement('div');
-  leftAtom.className = 'molecule-atom';
-  leftAtom.style.backgroundColor = getColorForElectronegativity(lessEN.electronegativity);
-  
-  const leftSymbol = document.createElement('div');
-  leftSymbol.className = 'molecule-symbol';
-  leftSymbol.textContent = lessEN.symbol;
-  leftAtom.appendChild(leftSymbol);
-  
-  // Add partial positive charge for polar bonds
-  if (bondClass === 'polar') {
-    const leftCharge = document.createElement('div');
-    leftCharge.className = 'molecule-charge positive';
-    leftCharge.textContent = 'δ+';
-    leftAtom.appendChild(leftCharge);
-  }
-  
-  // Create bond line
-  const bondLine = document.createElement('div');
-  bondLine.className = `molecule-bond ${bondClass}`;
-  
-  // Create right atom
-  const rightAtom = document.createElement('div');
-  rightAtom.className = 'molecule-atom';
-  rightAtom.style.backgroundColor = getColorForElectronegativity(moreEN.electronegativity);
-  
-  const rightSymbol = document.createElement('div');
-  rightSymbol.className = 'molecule-symbol';
-  rightSymbol.textContent = moreEN.symbol;
-  rightAtom.appendChild(rightSymbol);
-  
-  // Add partial negative charge for polar bonds
-  if (bondClass === 'polar') {
-    const rightCharge = document.createElement('div');
-    rightCharge.className = 'molecule-charge negative';
-    rightCharge.textContent = 'δ-';
-    rightAtom.appendChild(rightCharge);
-  }
-  
-  // Add elements to container
-  moleculeContainer.appendChild(leftAtom);
-  moleculeContainer.appendChild(bondLine);
-  moleculeContainer.appendChild(rightAtom);
-  
-  container.appendChild(moleculeContainer);
 }
 
 // Create visualization for nonpolar covalent bond
@@ -388,32 +327,6 @@ function applyOrbitalAnimation(electron, duration, delay, bias) {
   });
 }
 
-// Get color based on electronegativity value
-function getColorForElectronegativity(value) {
-  if (value === null) return '#cccccc'; // Gray for elements with no electronegativity
-  
-  const min = 0.7;  // Lowest electronegativity (Francium)
-  const max = 4.0;  // Highest electronegativity (Fluorine)
-  
-  // Normalize the value between 0 and 1
-  const normalized = (value - min) / (max - min);
-  
-  // Create a color gradient from red (low EN) to yellow to blue (high EN)
-  if (normalized < 0.5) {
-    // Red to yellow
-    const r = 255;
-    const g = Math.round(normalized * 2 * 255);
-    const b = 0;
-    return `rgb(${r}, ${g}, ${b})`;
-  } else {
-    // Yellow to blue
-    const r = Math.round((1 - (normalized - 0.5) * 2) * 255);
-    const g = Math.round((1 - (normalized - 0.5) * 2) * 255);
-    const b = Math.round((normalized - 0.5) * 2 * 255);
-    return `rgb(${r}, ${g}, ${b})`;
-  }
-}
-
 // Replace the existing bond visualization function with the enhanced version
 function analyzeBond(element1, element2) {
   const container = document.getElementById('bond-analysis');
@@ -433,5 +346,42 @@ function analyzeBond(element1, element2) {
   }
   
   // Calculate electronegativity difference
-  const enDiff = Math.
-(Content truncated due to size limit. Use line ranges to read in chunks)
+  const enDiff = Math.abs(element1.electronegativity - element2.electronegativity);
+  
+  // Determine bond type
+  let bondType, bondDescription;
+  if (enDiff < 0.4) {
+    bondType = 'Nonpolar Covalent Bond';
+    bondDescription = 'Electrons are shared equally between atoms.';
+  } else if (enDiff <= 1.7) {
+    bondType = 'Polar Covalent Bond';
+    bondDescription = 'Electrons are shared unequally, with a partial negative charge on the more electronegative atom.';
+  } else {
+    bondType = 'Ionic Bond';
+    bondDescription = 'Electrons are transferred from the less electronegative atom to the more electronegative atom.';
+  }
+  
+  // Create bond information
+  const bondInfo = document.createElement('div');
+  bondInfo.className = 'bond-info';
+  
+  const diffElement = document.createElement('div');
+  diffElement.className = 'en-difference';
+  diffElement.innerHTML = `<strong>Electronegativity Difference:</strong> ${enDiff.toFixed(2)}`;
+  bondInfo.appendChild(diffElement);
+  
+  const typeElement = document.createElement('div');
+  typeElement.className = 'bond-type';
+  typeElement.innerHTML = `<strong>Bond Type:</strong> ${bondType}`;
+  bondInfo.appendChild(typeElement);
+  
+  const descElement = document.createElement('div');
+  descElement.className = 'bond-description';
+  descElement.innerHTML = `<strong>Description:</strong> ${bondDescription}`;
+  bondInfo.appendChild(descElement);
+  
+  container.appendChild(bondInfo);
+  
+  // Create enhanced bond visualization
+  createEnhancedBondVisualization(container, element1, element2);
+}
