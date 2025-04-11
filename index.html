@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polar and Nonpolar Covalent Bonds Simulation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Polar and Nonpolar Covalent Bonds Simulation</h1>
+            <p>Explore how electronegativity differences determine bond polarity</p>
+        </header>
+
+        <div class="section instructions">
+            <h3>How to Use This Simulation</h3>
+            <p>1. Click on elements in the periodic table to select them (maximum 2 elements).</p>
+            <p>2. View the electronegativity difference and bond analysis.</p>
+            <p>3. Observe the visualization of electron sharing based on bond type.</p>
+            <p>4. Explore different element combinations to understand how electronegativity affects bonding.</p>
+        </div>
+
+        <div class="section">
+            <h2>Electronegativity Periodic Table</h2>
+            <p>The colors represent electronegativity values on the Pauling scale. Click on elements to select them.</p>
+            <div id="periodic-table-container" class="periodic-table-container"></div>
+        </div>
+
+        <div class="section">
+            <div id="selected-elements">
+                <h2>Selected Elements</h2>
+                <p>Click on elements in the periodic table to select them (maximum 2).</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <div id="bond-analysis">
+                <h2>Bond Analysis</h2>
+                <p>Select two elements to analyze their bond.</p>
+            </div>
+        </div>
+
+        <div class="section educational-content">
+            <h2>Educational Content</h2>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="openTab(event, 'tab-overview')">Overview</button>
+                    <button class="tab-button" onclick="openTab(event, 'tab-nonpolar')">Nonpolar Bonds</button>
+                    <button class="tab-button" onclick="openTab(event, 'tab-polar')">Polar Bonds</button>
+                    <button class="tab-button" onclick="openTab(event, 'tab-ionic')">Ionic Bonds</button>
+                </div>
+                
+                <div id="tab-overview" class="tab-content active">
+                    <h3>Understanding Chemical Bonds</h3>
+                    <p>Chemical bonds form when atoms share or transfer electrons to achieve a more stable electron configuration. The type of bond that forms depends on the difference in electronegativity between the atoms involved.</p>
+                    
+                    <h4>Electronegativity</h4>
+                    <p>Electronegativity is a measure of an atom's ability to attract shared electrons in a chemical bond. The Pauling scale is the most commonly used scale for electronegativity, with values ranging from 0.7 to 4.0.</p>
+                    
+                    <h4>Bond Types Based on Electronegativity Difference</h4>
+                    <ul>
+                        <li><strong>Nonpolar Covalent Bond:</strong> Electronegativity difference &lt; 0.5</li>
+                        <li><strong>Polar Covalent Bond:</strong> Electronegativity difference between 0.5 and 1.7</li>
+                        <li><strong>Ionic Bond:</strong> Electronegativity difference &gt; 1.7</li>
+                    </ul>
+                </div>
+                
+                <div id="tab-nonpolar" class="tab-content">
+                    <h3>Nonpolar Covalent Bonds</h3>
+                    <p>Nonpolar covalent bonds form between atoms with similar electronegativity values (difference less than 0.5). In these bonds, electrons are shared equally between the atoms.</p>
+                    
+                    <h4>Key Characteristics:</h4>
+                    <ul>
+                        <li>Equal sharing of electrons</li>
+                        <li>No partial charges develop</li>
+                        <li>Symmetrical electron distribution</li>
+                        <li>Examples: H-H, C-C, O=O</li>
+                    </ul>
+                    
+                    <p>In molecules with nonpolar bonds, the electron density is evenly distributed, resulting in no separation of charge. This makes these molecules generally less reactive than polar molecules.</p>
+                </div>
+                
+                <div id="tab-polar" class="tab-content">
+                    <h3>Polar Covalent Bonds</h3>
+                    <p>Polar covalent bonds form between atoms with moderately different electronegativity values (difference between 0.5 and 1.7). In these bonds, electrons are shared unequally, with the more electronegative atom pulling the shared electrons closer to itself.</p>
+                    
+                    <h4>Key Characteristics:</h4>
+                    <ul>
+                        <li>Unequal sharing of electrons</li>
+                        <li>Partial negative charge (δ-) on the more electronegative atom</li>
+                        <li>Partial positive charge (δ+) on the less electronegative atom</li>
+                        <li>Examples: H-O, C-O, N-H</li>
+                    </ul>
+                    
+                    <p>The uneven distribution of electrons creates a dipole, with one end of the bond slightly negative and the other slightly positive. This polarity affects the physical properties of molecules, such as boiling point and solubility.</p>
+                </div>
+                
+                <div id="tab-ionic" class="tab-content">
+                    <h3>Ionic Bonds</h3>
+                    <p>Ionic bonds form between atoms with very different electronegativity values (difference greater than 1.7). In these bonds, electrons are completely transferred from the less electronegative atom to the more electronegative atom.</p>
+                    
+                    <h4>Key Characteristics:</h4>
+                    <ul>
+                        <li>Complete transfer of electrons</li>
+                        <li>Formation of positive and negative ions</li>
+                        <li>Strong electrostatic attraction between ions</li>
+                        <li>Examples: Na-Cl, K-F, Mg-O</li>
+                    </ul>
+                    
+                    <p>Ionic compounds typically form crystalline structures where each ion is surrounded by ions of the opposite charge. They generally have high melting and boiling points and conduct electricity when dissolved in water or melted.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/periodic_table.js"></script>
+    <script src="js/element_selection.js"></script>
+    <script src="js/bond_visualization.js"></script>
+    <script src="js/educational_content.js"></script>
+    <script src="js/debug.js"></script>
+    <script>
+        function openTab(evt, tabId) {
+            // Hide all tab content
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            // Remove active class from all tab buttons
+            const tabButtons = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            // Show the selected tab content and mark button as active
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
