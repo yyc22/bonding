@@ -10,6 +10,7 @@ const express = require('express');
 const channelsRouter = require('./routes/channels');
 const authRouter = require('./routes/auth');
 const scheduler = require('./services/scheduler');
+const { seedYoutubeChannels } = require('./services/seed');
 
 const app = express();
 app.use(express.json());
@@ -20,7 +21,8 @@ app.use('/api/channels', channelsRouter);
 app.use('/auth', authRouter);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Subscriber dashboard listening on http://localhost:${PORT}`);
+  await seedYoutubeChannels();
   scheduler.start();
 });

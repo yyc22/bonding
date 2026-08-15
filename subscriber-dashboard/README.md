@@ -61,6 +61,8 @@ track.
    the account you want to track.
 
 If you skip this section, the app works fine with YouTube-only tracking.
+There's no equivalent "pre-fill" for TikTok — it always tracks whichever
+account you log in with when you click **Connect TikTok**.
 
 ### 3. Run it
 
