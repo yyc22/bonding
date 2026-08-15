@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Subscriber Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Subscriber Dashboard</h1>
+    <button class="tiktok-btn" id="connect-tiktok">Connect TikTok</button>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Add a YouTube channel</h2>
+      <form class="add-form" id="add-youtube-form">
+        <input type="text" id="youtube-input" placeholder="Channel ID (UC...) or @handle" required />
+        <button type="submit">Add</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Channels</h2>
+      <div class="channel-grid" id="channel-grid">
+        <p class="empty-state">Loading...</p>
+      </div>
+    </section>
+
+    <section class="panel" id="history-panel" style="display:none;">
+      <h2 id="history-title">History</h2>
+      <canvas id="history-chart" width="880" height="220"></canvas>
+    </section>
+  </main>
+
+  <div id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

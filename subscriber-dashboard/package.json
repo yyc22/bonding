@@ -1,0 +1,17 @@
+{
+  "name": "subscriber-dashboard",
+  "version": "1.0.0",
+  "description": "Pull YouTube and TikTok channel stats into one place and track subscriber growth over time.",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
