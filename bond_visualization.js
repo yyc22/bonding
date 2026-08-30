@@ -206,7 +206,7 @@ function createIonicBondVisualization(container, lessEN, moreEN) {
 function createAtomElement(element) {
   const atom = document.createElement('div');
   atom.className = 'atom';
-  atom.style.backgroundColor = getColorForElectronegativity(element.electronegativity);
+    atom.style.backgroundColor = colorScale.getColor(element.electronegativity);
   
   const symbol = document.createElement('div');
   symbol.className = 'atom-symbol';
