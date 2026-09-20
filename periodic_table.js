@@ -256,15 +256,9 @@ function createLegend(container) {
   legend.appendChild(scale);
   container.appendChild(legend);
   
-  // Add bond type thresholds
-  const thresholds = document.createElement('div');
-  thresholds.className = 'thresholds';
-  thresholds.innerHTML = `
-    <div><span class="threshold-marker" style="background-color: #ffcc00;"></span> Difference < 0.5: Nonpolar Covalent Bond</div>
-    <div><span class="threshold-marker" style="background-color: #00ccff;"></span> Difference 0.5-1.7: Polar Covalent Bond</div>
-    <div><span class="threshold-marker" style="background-color: #ff3366;"></span> Difference > 1.7: Ionic Bond</div>
-  `;
-  container.appendChild(thresholds);
+  const note = document.createElement('p');
+  note.textContent = 'Electronegativity difference estimates bond polarity; it does not uniquely determine bond type. See the theory and references below.';
+  container.appendChild(note);
 }
 
 // Handle element selection
@@ -366,133 +360,7 @@ function updatePeriodicTableHighlighting() {
   });
 }
 
-// Analyze the bond between two elements
-function analyzeBond(element1, element2) {
-  const container = document.getElementById('bond-analysis');
-  if (!container) return;
-  
-  // Clear existing content
-  container.innerHTML = '';
-  
-  // Add title
-  const title = document.createElement('h2');
-  title.textContent = 'Bond Analysis';
-  container.appendChild(title);
-  
-  // Check if both elements have electronegativity values
-  if (element1.electronegativity === null || element2.electronegativity === null) {
-    const message = document.createElement('p');
-    message.textContent = 'Electronegativity data not available for one or both selected elements.';
-    container.appendChild(message);
-    return;
-  }
-  
-  // Calculate electronegativity difference
-  const enDiff = Math.abs(element1.electronegativity - element2.electronegativity);
-  
-  // Determine bond type
-  let bondType, bondDescription;
-  if (enDiff < 0.5) {
-    bondType = 'Nonpolar Covalent Bond';
-    bondDescription = 'Electrons are shared equally between atoms.';
-  } else if (enDiff <= 1.7) {
-    bondType = 'Polar Covalent Bond';
-    bondDescription = 'Electrons are shared unequally, with a partial negative charge on the more electronegative atom.';
-  } else {
-    bondType = 'Ionic Bond';
-    bondDescription = 'Electrons are transferred from the less electronegative atom to the more electronegative atom.';
-  }
-  
-  // Create bond information
-  const bondInfo = document.createElement('div');
-  bondInfo.className = 'bond-info';
-  
-  const diffElement = document.createElement('div');
-  diffElement.className = 'en-difference';
-  diffElement.innerHTML = `<strong>Electronegativity Difference:</strong> ${enDiff.toFixed(2)}`;
-  bondInfo.appendChild(diffElement);
-  
-  const typeElement = document.createElement('div');
-  typeElement.className = 'bond-type';
-  typeElement.innerHTML = `<strong>Bond Type:</strong> ${bondType}`;
-  bondInfo.appendChild(typeElement);
-  
-  const descElement = document.createElement('div');
-  descElement.className = 'bond-description';
-  descElement.innerHTML = `<strong>Description:</strong> ${bondDescription}`;
-  bondInfo.appendChild(descElement);
-  
-  container.appendChild(bondInfo);
-  
-  // Create bond visualization
-  createBondVisualization(container, element1, element2, enDiff, bondType);
-}
-
-// Create a visualization of the bond
-function createBondVisualization(container, element1, element2, enDiff, bondType) {
-  const visualization = document.createElement('div');
-  visualization.className = 'bond-visualization';
-  
-  // Determine which element is more electronegative
-  const moreEN = element1.electronegativity > element2.electronegativity ? element1 : element2;
-  const lessEN = element1.electronegativity > element2.electronegativity ? element2 : element1;
-  
-  // Create visualization based on bond type
-  if (bondType === 'Nonpolar Covalent Bond') {
-    visualization.innerHTML = `
-      <div class="bond-title">Equal Electron Sharing</div>
-      <div class="bond-diagram nonpolar">
-        <div class="atom" style="background-color: ${colorScale.getColor(element1.electronegativity)}">
-          <div class="atom-symbol">${element1.symbol}</div>
-        </div>
-        <div class="electron-cloud">
-          <div class="electrons"></div>
-        </div>
-        <div class="atom" style="background-color: ${colorScale.getColor(element2.electronegativity)}">
-          <div class="atom-symbol">${element2.symbol}</div>
-        </div>
-      </div>
-    `;
-  } else if (bondType === 'Polar Covalent Bond') {
-    visualization.innerHTML = `
-      <div class="bond-title">Unequal Electron Sharing</div>
-      <div class="bond-diagram polar">
-        <div class="atom" style="background-color: ${colorScale.getColor(lessEN.electronegativity)}">
-          <div class="atom-symbol">${lessEN.symbol}</div>
-          <div class="partial-charge">δ+</div>
-        </div>
-        <div class="electron-cloud shifted">
-          <div class="electrons"></div>
-          <div class="polarity-arrow">→</div>
-        </div>
-        <div class="atom" style="background-color: ${colorScale.getColor(moreEN.electronegativity)}">
-          <div class="atom-symbol">${moreEN.symbol}</div>
-          <div class="partial-charge">δ-</div>
-        </div>
-      </div>
-    `;
-  } else {
-    visualization.innerHTML = `
-      <div class="bond-title">Electron Transfer</div>
-      <div class="bond-diagram ionic">
-        <div class="atom" style="background-color: ${colorScale.getColor(lessEN.electronegativity)}">
-          <div class="atom-symbol">${lessEN.symbol}</div>
-          <div class="ionic-charge">+</div>
-        </div>
-        <div class="electron-transfer">
-          <div class="transfer-arrow">→</div>
-          <div class="electron-dot">e-</div>
-        </div>
-        <div class="atom" style="background-color: ${colorScale.getColor(moreEN.electronegativity)}">
-          <div class="atom-symbol">${moreEN.symbol}</div>
-          <div class="ionic-charge">-</div>
-        </div>
-      </div>
-    `;
-  }
-  
-  container.appendChild(visualization);
-}
+// Bond analysis is defined once in bond_visualization.js.
 
 // Clear bond analysis
 function clearBondAnalysis() {
