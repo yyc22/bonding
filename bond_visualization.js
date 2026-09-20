@@ -1,387 +1,46 @@
-// Bond Visualization Component
-// This script enhances the visualization of chemical bonds based on electronegativity differences
-
-// Constants for visualization
-const ANIMATION_DURATION = 2000; // ms
-const ELECTRON_DENSITY = 10; // number of electron dots
-
-// Create a more detailed bond visualization
-function createEnhancedBondVisualization(container, element1, element2) {
-  // Clear any existing visualization
-  const existingViz = container.querySelector('.bond-visualization');
-  if (existingViz) {
-    container.removeChild(existingViz);
-  }
-  
-  // Calculate electronegativity difference
-  if (element1.electronegativity === null || element2.electronegativity === null) {
-    return createUnavailableDataVisualization(container);
-  }
-  
-  const enDiff = Math.abs(element1.electronegativity - element2.electronegativity);
-  
-  // Determine bond type
-  let bondType, bondClass;
-  if (enDiff < 0.4) {
-    bondType = 'Nonpolar Covalent Bond';
-    bondClass = 'nonpolar';
-  } else if (enDiff <= 1.7) {
-    bondType = 'Polar Covalent Bond';
-    bondClass = 'polar';
-  } else {
-    bondType = 'Ionic Bond';
-    bondClass = 'ionic';
-  }
-  
-  // Determine which element is more electronegative
-  const moreEN = element1.electronegativity > element2.electronegativity ? element1 : element2;
-  const lessEN = element1.electronegativity > element2.electronegativity ? element2 : element1;
-  
-  // Create visualization container
-  const visualization = document.createElement('div');
-  visualization.className = 'bond-visualization';
-  
-  // Add title
-  const title = document.createElement('div');
-  title.className = 'bond-title';
-  title.textContent = getBondTitle(bondClass);
-  visualization.appendChild(title);
-  
-  // Create bond diagram
-  const diagram = document.createElement('div');
-  diagram.className = `bond-diagram ${bondClass}`;
-  
-  // Add content based on bond type
-  if (bondClass === 'nonpolar') {
-    createNonpolarBondVisualization(diagram, element1, element2);
-  } else if (bondClass === 'polar') {
-    createPolarBondVisualization(diagram, lessEN, moreEN, enDiff);
-  } else {
-    createIonicBondVisualization(diagram, lessEN, moreEN);
-  }
-  
-  visualization.appendChild(diagram);
-  
-  // Add explanation
-  const explanation = document.createElement('div');
-  explanation.className = 'bond-explanation';
-  explanation.innerHTML = getBondExplanation(bondClass, lessEN, moreEN, enDiff);
-  visualization.appendChild(explanation);
-  
-  container.appendChild(visualization);
-  
-  // Initialize animations after the elements are added to the DOM
-  setTimeout(() => {
-    initializeBondAnimations(bondClass);
-  }, 100);
+// One classification model for results and diagrams. Reference examples refer to named substances.
+const NONMETALS = new Set(['H','C','N','O','F','P','S','Cl','Se','Br','I']);
+const SPECIAL = new Set(['He','Ne','Ar','Kr','Xe','Rn','B','Si','Ge','As','Sb','Te','Po','At']);
+const IONIC_EXAMPLES = {
+ 'Cl-Na': ['NaCl','Na','+','Cl','−'],
+ 'F-K': ['KF','K','+','F','−'],
+ 'Mg-O': ['MgO','Mg','2+','O','2−'],
+ 'Ca-F': ['CaF₂','Ca','2+','F','−'],
+ 'I-Mn': ['MnI₂','Mn','2+','I','−']
+};
+function classifyBond(a,b) {
+ const diff = Math.abs(a.electronegativity-b.electronegativity);
+ const key = [a.symbol,b.symbol].sort().join('-');
+ if (!Number.isFinite(a.electronegativity)||!Number.isFinite(b.electronegativity)) return {kind:'unknown',label:'Insufficient data',text:'No electronegativity value is available for one or both elements.'};
+ if (IONIC_EXAMPLES[key]) return {kind:'ionic',label:'Ionic bonding in '+IONIC_EXAMPLES[key][0],ions:IONIC_EXAMPLES[key],text:'This named solid contains oppositely charged ions in an extended lattice. The formula gives their ratio; it does not describe an isolated pair of atoms.'};
+ if(NONMETALS.has(a.symbol)&&NONMETALS.has(b.symbol)) {
+ const weak = diff < 0.4;
+ return {kind:weak?'nonpolar':'polar',label:weak?'Nonpolar or weakly polar covalent bond':'Polar Covalent Bond',text:key==='F-H'?'In hydrogen fluoride (HF), H and F share a bonding electron pair unequally: Hδ+–Fδ−. ΔEN = 1.78 with this table. A value above 1.7 does not make HF ionic.':weak?'If these atoms form a covalent bond, its polarity is small. Below 0.4 is a classroom approximation, not an exact boundary; equal sharing applies to identical atoms.':'If these nonmetal atoms form a bond, shared electron density is drawn toward the more electronegative atom. This comparison does not establish a stable molecular formula.'};
+ }
+ const metal = e=>!NONMETALS.has(e.symbol)&&!SPECIAL.has(e.symbol);
+ if(metal(a)&&metal(b)) return {kind:'metallic',label:'Metallic bonding model',text:'Bulk metals and many alloys are described by metal centres with delocalised electrons, not a shared electron pair between two isolated atoms. The actual alloy structure requires more information.'};
+ return {kind:'unknown',label:'Compound and structure needed',text:'These element choices and ΔEN alone do not establish a bond type. Metal–nonmetal compounds are often ionic, but exceptions exist. Specify a formula, physical state and structure before assigning bonding.'};
 }
-
-// Create visualization for nonpolar covalent bond
-function createNonpolarBondVisualization(container, element1, element2) {
-  // Left atom
-  const leftAtom = createAtomElement(element1);
-  container.appendChild(leftAtom);
-  
-  // Electron cloud (shared equally)
-  const electronCloud = document.createElement('div');
-  electronCloud.className = 'electron-cloud';
-  
-  // Add electron dots
-  const electrons = document.createElement('div');
-  electrons.className = 'electrons';
-  
-  // Add individual electron dots for animation
-  for (let i = 0; i < ELECTRON_DENSITY; i++) {
-    const electron = document.createElement('div');
-    electron.className = 'electron-dot';
-    electron.style.left = `${Math.random() * 100}%`;
-    electron.style.top = `${Math.random() * 100}%`;
-    electrons.appendChild(electron);
-  }
-  
-  electronCloud.appendChild(electrons);
-  container.appendChild(electronCloud);
-  
-  // Right atom
-  const rightAtom = createAtomElement(element2);
-  container.appendChild(rightAtom);
-}
-
-// Create visualization for polar covalent bond
-function createPolarBondVisualization(container, lessEN, moreEN, enDiff) {
-  // Less electronegative atom
-  const leftAtom = createAtomElement(lessEN);
-  const leftCharge = document.createElement('div');
-  leftCharge.className = 'partial-charge';
-  leftCharge.textContent = 'δ+';
-  leftAtom.appendChild(leftCharge);
-  container.appendChild(leftAtom);
-  
-  // Electron cloud (shifted toward more electronegative atom)
-  const electronCloud = document.createElement('div');
-  electronCloud.className = 'electron-cloud shifted';
-  
-  // Calculate shift based on electronegativity difference
-  const shiftPercentage = Math.min(80, Math.max(55, 50 + (enDiff / 1.7) * 30));
-  electronCloud.style.background = `linear-gradient(to right, 
-    rgba(255,255,255,0.1) ${100-shiftPercentage}%, 
-    rgba(0,0,255,0.2) ${shiftPercentage}%)`;
-  
-  // Add electron dots
-  const electrons = document.createElement('div');
-  electrons.className = 'electrons';
-  
-  // Add individual electron dots with bias toward more electronegative atom
-  for (let i = 0; i < ELECTRON_DENSITY; i++) {
-    const electron = document.createElement('div');
-    electron.className = 'electron-dot';
-    
-    // Bias position toward more electronegative atom
-    const biasedPosition = Math.random() * 100;
-    const adjustedPosition = biasedPosition + (Math.random() * 20 * (enDiff / 1.7));
-    const finalPosition = Math.min(100, adjustedPosition);
-    
-    electron.style.left = `${finalPosition}%`;
-    electron.style.top = `${Math.random() * 100}%`;
-    electrons.appendChild(electron);
-  }
-  
-  electronCloud.appendChild(electrons);
-  
-  // Add polarity arrow
-  const polarityArrow = document.createElement('div');
-  polarityArrow.className = 'polarity-arrow';
-  polarityArrow.textContent = '→';
-  electronCloud.appendChild(polarityArrow);
-  
-  container.appendChild(electronCloud);
-  
-  // More electronegative atom
-  const rightAtom = createAtomElement(moreEN);
-  const rightCharge = document.createElement('div');
-  rightCharge.className = 'partial-charge';
-  rightCharge.textContent = 'δ-';
-  rightAtom.appendChild(rightCharge);
-  container.appendChild(rightAtom);
-}
-
-// Create visualization for ionic bond
-function createIonicBondVisualization(container, lessEN, moreEN) {
-  // Less electronegative atom (cation)
-  const leftAtom = createAtomElement(lessEN);
-  const leftCharge = document.createElement('div');
-  leftCharge.className = 'ionic-charge';
-  leftCharge.textContent = '+';
-  leftAtom.appendChild(leftCharge);
-  container.appendChild(leftAtom);
-  
-  // Electron transfer visualization
-  const electronTransfer = document.createElement('div');
-  electronTransfer.className = 'electron-transfer';
-  
-  // Add transfer arrow
-  const transferArrow = document.createElement('div');
-  transferArrow.className = 'transfer-arrow';
-  transferArrow.textContent = '→';
-  electronTransfer.appendChild(transferArrow);
-  
-  // Add electron dot
-  const electronDot = document.createElement('div');
-  electronDot.className = 'electron-dot transferring';
-  electronDot.textContent = 'e-';
-  electronTransfer.appendChild(electronDot);
-  
-  container.appendChild(electronTransfer);
-  
-  // More electronegative atom (anion)
-  const rightAtom = createAtomElement(moreEN);
-  const rightCharge = document.createElement('div');
-  rightCharge.className = 'ionic-charge';
-  rightCharge.textContent = '-';
-  rightAtom.appendChild(rightCharge);
-  container.appendChild(rightAtom);
-}
-
-// Create a basic atom element
-function createAtomElement(element) {
-  const atom = document.createElement('div');
-  atom.className = 'atom';
-    atom.style.backgroundColor = colorScale.getColor(element.electronegativity);
-  
-  const symbol = document.createElement('div');
-  symbol.className = 'atom-symbol';
-  symbol.textContent = element.symbol;
-  atom.appendChild(symbol);
-  
-  return atom;
-}
-
-// Create visualization for unavailable data
-function createUnavailableDataVisualization(container) {
-  const visualization = document.createElement('div');
-  visualization.className = 'bond-visualization';
-  
-  const message = document.createElement('div');
-  message.className = 'unavailable-data';
-  message.textContent = 'Electronegativity data not available for one or both selected elements.';
-  visualization.appendChild(message);
-  
-  container.appendChild(visualization);
-}
-
-// Get title for bond visualization
-function getBondTitle(bondClass) {
-  switch (bondClass) {
-    case 'nonpolar':
-      return 'Equal Electron Sharing (Nonpolar Covalent Bond)';
-    case 'polar':
-      return 'Unequal Electron Sharing (Polar Covalent Bond)';
-    case 'ionic':
-      return 'Electron Transfer (Ionic Bond)';
-    default:
-      return 'Bond Visualization';
-  }
-}
-
-// Get explanation text for bond visualization
-function getBondExplanation(bondClass, lessEN, moreEN, enDiff) {
-  switch (bondClass) {
-    case 'nonpolar':
-      return `
-        <p>In a <strong>nonpolar covalent bond</strong>, electrons are shared equally between atoms with similar electronegativity values (difference less than 0.4).</p>
-        <p>The electron cloud is symmetrically distributed between the atoms, and no partial charges develop.</p>
-        <p>This equal sharing occurs because both atoms have similar "pulling power" for the shared electrons.</p>
-      `;
-    case 'polar':
-      return `
-        <p>In a <strong>polar covalent bond</strong>, electrons are shared unequally between atoms with different electronegativity values (difference between 0.4 and 1.7).</p>
-        <p>${moreEN.symbol} (EN: ${moreEN.electronegativity.toFixed(2)}) is more electronegative than ${lessEN.symbol} (EN: ${lessEN.electronegativity.toFixed(2)}), so it pulls the shared electrons closer to itself.</p>
-        <p>This creates a partial negative charge (δ-) on ${moreEN.symbol} and a partial positive charge (δ+) on ${lessEN.symbol}, forming a dipole with a difference of ${enDiff.toFixed(2)} on the Pauling scale.</p>
-      `;
-    case 'ionic':
-      return `
-        <p>In an <strong>ionic bond</strong>, electrons are completely transferred from the less electronegative atom to the more electronegative atom (difference greater than 1.7).</p>
-        <p>${lessEN.symbol} (EN: ${lessEN.electronegativity.toFixed(2)}) loses an electron to ${moreEN.symbol} (EN: ${moreEN.electronegativity.toFixed(2)}), becoming a positive ion (cation).</p>
-        <p>${moreEN.symbol} gains an electron, becoming a negative ion (anion). The resulting ions are held together by strong electrostatic attraction.</p>
-      `;
-    default:
-      return '';
-  }
-}
-
-// Initialize animations for bond visualizations
-function initializeBondAnimations(bondClass) {
-  // Get all electron dots
-  const electrons = document.querySelectorAll('.electron-dot:not(.transferring)');
-  
-  // Apply random animations to each electron
-  electrons.forEach(electron => {
-    // Set random animation properties
-    const duration = ANIMATION_DURATION + (Math.random() * 1000);
-    const delay = Math.random() * 1000;
-    
-    // Apply different animations based on bond type
-    if (bondClass === 'nonpolar') {
-      applyOrbitalAnimation(electron, duration, delay, 0.5);
-    } else if (bondClass === 'polar') {
-      applyOrbitalAnimation(electron, duration, delay, 0.7);
-    }
-  });
-  
-  // Special animation for transferring electron in ionic bond
-  const transferringElectron = document.querySelector('.electron-dot.transferring');
-  if (transferringElectron) {
-    transferringElectron.style.animation = 'transferMove 3s ease-in-out infinite';
-  }
-}
-
-// Apply orbital animation to electron
-function applyOrbitalAnimation(electron, duration, delay, bias) {
-  // Create keyframes for random orbital motion
-  const keyframes = [];
-  const steps = 10;
-  
-  for (let i = 0; i <= steps; i++) {
-    const progress = i / steps;
-    
-    // Calculate position with bias toward more electronegative atom if needed
-    let x = Math.sin(progress * Math.PI * 2) * (30 + Math.random() * 20);
-    if (bias > 0.5) {
-      x = x + (bias - 0.5) * 40; // Shift toward more electronegative atom
-    }
-    
-    const y = Math.cos(progress * Math.PI * 2) * (30 + Math.random() * 20);
-    
-    keyframes.push({
-      transform: `translate(${x}%, ${y}%)`,
-      offset: progress
-    });
-  }
-  
-  // Apply the animation
-  electron.animate(keyframes, {
-    duration: duration,
-    delay: delay,
-    iterations: Infinity,
-    easing: 'ease-in-out'
-  });
-}
-
-// Replace the existing bond visualization function with the enhanced version
-function analyzeBond(element1, element2) {
-  const container = document.getElementById('bond-analysis');
-  if (!container) return;
-  
-  // Clear existing content except the heading
-  const heading = container.querySelector('h2');
-  container.innerHTML = '';
-  container.appendChild(heading);
-  
-  // Check if both elements have electronegativity values
-  if (element1.electronegativity === null || element2.electronegativity === null) {
-    const message = document.createElement('p');
-    message.textContent = 'Electronegativity data not available for one or both selected elements.';
-    container.appendChild(message);
-    return;
-  }
-  
-  // Calculate electronegativity difference
-  const enDiff = Math.abs(element1.electronegativity - element2.electronegativity);
-  
-  // Determine bond type
-  let bondType, bondDescription;
-  if (enDiff < 0.4) {
-    bondType = 'Nonpolar Covalent Bond';
-    bondDescription = 'Electrons are shared equally between atoms.';
-  } else if (enDiff <= 1.7) {
-    bondType = 'Polar Covalent Bond';
-    bondDescription = 'Electrons are shared unequally, with a partial negative charge on the more electronegative atom.';
-  } else {
-    bondType = 'Ionic Bond';
-    bondDescription = 'Electrons are transferred from the less electronegative atom to the more electronegative atom.';
-  }
-  
-  // Create bond information
-  const bondInfo = document.createElement('div');
-  bondInfo.className = 'bond-info';
-  
-  const diffElement = document.createElement('div');
-  diffElement.className = 'en-difference';
-  diffElement.innerHTML = `<strong>Electronegativity Difference:</strong> ${enDiff.toFixed(2)}`;
-  bondInfo.appendChild(diffElement);
-  
-  const typeElement = document.createElement('div');
-  typeElement.className = 'bond-type';
-  typeElement.innerHTML = `<strong>Bond Type:</strong> ${bondType}`;
-  bondInfo.appendChild(typeElement);
-  
-  const descElement = document.createElement('div');
-  descElement.className = 'bond-description';
-  descElement.innerHTML = `<strong>Description:</strong> ${bondDescription}`;
-  bondInfo.appendChild(descElement);
-  
-  container.appendChild(bondInfo);
-  
-  // Create enhanced bond visualization
-  createEnhancedBondVisualization(container, element1, element2);
+function analyzeBond(a,b) {
+ const box=document.getElementById('bond-analysis');
+ const result=classifyBond(a,b);
+ const diff=Math.abs(a.electronegativity-b.electronegativity);
+ box.innerHTML='<h2>Bond Analysis</h2>';
+ const info=document.createElement('div'); info.className='bond-info';
+ const valid=Number.isFinite(a.electronegativity)&&Number.isFinite(b.electronegativity);
+ info.innerHTML='<p><strong>Electronegativity difference:</strong> '+(valid?diff.toFixed(2):'Unavailable')+'</p><h3>'+result.label+'</h3><p>'+result.text+'</p>';
+ box.appendChild(info);
+ if(result.kind==='polar'||result.kind==='nonpolar') {
+  const left=a.electronegativity<=b.electronegativity?a:b, right=left===a?b:a;
+  const polar=result.kind==='polar';
+  const diagram=document.createElement('div'); diagram.className='bond-visualization';
+  diagram.innerHTML='<div class="bond-title">'+(polar?'Unequal electron sharing':'Approximately equal electron sharing')+'</div><div class="bond-diagram '+(polar?'polar':'nonpolar')+'"><div class="atom"><div class="atom-symbol">'+left.symbol+'</div>'+(polar?'<div class="partial-charge">δ+</div>':'')+'</div><div class="electron-cloud '+(polar?'shifted':'')+'" style="background:linear-gradient(90deg,#b9dbed,#436fc8);"><div class="electrons">••</div></div><div class="atom"><div class="atom-symbol">'+right.symbol+'</div>'+(polar?'<div class="partial-charge">δ−</div>':'')+'</div></div><p>Shared electron pair; schematic only, not electron paths, sizes or a calculated density map.</p>';
+  box.appendChild(diagram);
+ } else if(result.kind==='ionic') {
+  const [formula,cation,plus,anion,minus]=result.ions;
+  const diagram=document.createElement('p');
+  diagram.className='bond-visualization';
+  diagram.innerHTML='<strong>'+cation+'<sup>'+plus+'</sup> ⋯ '+anion+'<sup>'+minus+'</sup></strong><br>Electrostatic attraction in the '+formula+' lattice. Ion charges shown are formal charges; this is not an electron-transfer animation.';
+  box.appendChild(diagram);
+ }
 }
