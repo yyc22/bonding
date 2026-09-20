@@ -11,7 +11,7 @@
     <div class="container">
         <header>
             <h1>Polar and Nonpolar Covalent Bonds Simulation</h1>
-            <p>Explore how electronegativity differences determine bond polarity</p>
+            <p>Explore bond polarity, bonding models and their limits</p>
         </header>
 
         <div class="section instructions">
@@ -43,84 +43,28 @@
         </div>
 
         <div class="section educational-content">
-            <h2>Educational Content</h2>
-            
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="openTab(event, 'tab-overview')">Overview</button>
-                    <button class="tab-button" onclick="openTab(event, 'tab-nonpolar')">Nonpolar Bonds</button>
-                    <button class="tab-button" onclick="openTab(event, 'tab-polar')">Polar Bonds</button>
-                    <button class="tab-button" onclick="openTab(event, 'tab-ionic')">Ionic Bonds</button>
-                </div>
-                
-                <div id="tab-overview" class="tab-content active">
-                    <h3>Understanding Chemical Bonds</h3>
-                    <p>Chemical bonds form when atoms share or transfer electrons to achieve a more stable electron configuration. The type of bond that forms depends on the difference in electronegativity between the atoms involved.</p>
-                    
-                    <h4>Electronegativity</h4>
-                    <p>Electronegativity is a measure of an atom's ability to attract shared electrons in a chemical bond. The Pauling scale is the most commonly used scale for electronegativity, with values ranging from 0.7 to 4.0.</p>
-                    
-                    <h4>Bond Types Based on Electronegativity Difference</h4>
-                    <ul>
-                        <li><strong>Nonpolar Covalent Bond:</strong> Electronegativity difference &lt; 0.4</li>
-                        <li><strong>Polar Covalent Bond:</strong> Electronegativity difference between 0.4 and 1.7</li>
-                        <li><strong>Ionic Bond:</strong> Electronegativity difference &gt; 1.7</li>
-                    </ul>
-                </div>
-                
-                <div id="tab-nonpolar" class="tab-content">
-                    <h3>Nonpolar Covalent Bonds</h3>
-                    <p>Nonpolar covalent bonds form between atoms with similar electronegativity values (difference less than 0.5). In these bonds, electrons are shared equally between the atoms.</p>
-                    
-                    <h4>Key Characteristics:</h4>
-                    <ul>
-                        <li>Equal sharing of electrons</li>
-                        <li>No partial charges develop</li>
-                        <li>Symmetrical electron distribution</li>
-                        <li>Examples: H-H, C-C, O=O</li>
-                    </ul>
-                    
-                    <p>In molecules with nonpolar bonds, the electron density is evenly distributed, resulting in no separation of charge. This makes these molecules generally less reactive than polar molecules.</p>
-                </div>
-                
-                <div id="tab-polar" class="tab-content">
-                    <h3>Polar Covalent Bonds</h3>
-                    <p>Polar covalent bonds form between atoms with moderately different electronegativity values (difference between 0.5 and 1.7). In these bonds, electrons are shared unequally, with the more electronegative atom pulling the shared electrons closer to itself.</p>
-                    
-                    <h4>Key Characteristics:</h4>
-                    <ul>
-                        <li>Unequal sharing of electrons</li>
-                        <li>Partial negative charge (δ-) on the more electronegative atom</li>
-                        <li>Partial positive charge (δ+) on the less electronegative atom</li>
-                        <li>Examples: H-O, C-O, N-H</li>
-                    </ul>
-                    
-                    <p>The uneven distribution of electrons creates a dipole, with one end of the bond slightly negative and the other slightly positive. This polarity affects the physical properties of molecules, such as boiling point and solubility.</p>
-                </div>
-                
-                <div id="tab-ionic" class="tab-content">
-                    <h3>Ionic Bonds</h3>
-                    <p>Ionic bonds form between atoms with very different electronegativity values (difference greater than 1.7). In these bonds, electrons are completely transferred from the less electronegative atom to the more electronegative atom.</p>
-                    
-                    <h4>Key Characteristics:</h4>
-                    <ul>
-                        <li>Complete transfer of electrons</li>
-                        <li>Formation of positive and negative ions</li>
-                        <li>Strong electrostatic attraction between ions</li>
-                        <li>Examples: Na-Cl, K-F, Mg-O</li>
-                    </ul>
-                    
-                    <p>Ionic compounds typically form crystalline structures where each ion is surrounded by ions of the opposite charge. They generally have high melting and boiling points and conduct electricity when dissolved in water or melted.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-        <script src="periodic_table.js"></script>
-        <script src="element_selection.js"></script>
-        <script src="bond_visualization.js"></script>
-        <script src="educational_content.js"></script>
-        <script src="debug.js"></script>
+<h2>Bonding theory and model limits</h2>
+<p>Electronegativity describes attraction for bonding electrons. Its difference is a guide to polarity, not a universal classifier. Ionic and covalent character form a continuum.</p>
+<h3>Covalent bonds</h3>
+<p>Covalent bonding involves shared electron density. Identical bonded atoms share equally; different atoms can share unequally. A difference below 0.4 is used here only as an approximate guide to weak polarity. There is no upper electronegativity cutoff that automatically makes a bond ionic.</p>
+<h3>Why H–F is polar covalent</h3>
+<p>HF contains a shared bonding electron pair drawn toward fluorine: Hδ+–Fδ−. This table uses H = 2.20 and F = 3.98, so ΔEN = 1.78. Some textbooks use rounded values and obtain 1.9. Neither result changes HF into an ionic compound. Hydrogen bonding between HF molecules is distinct from the covalent bond within each molecule.</p>
+<h3>Ionic and metallic bonding</h3>
+<p>Ionic bonding is attraction between oppositely charged ions, typically throughout a solid lattice. Electron transfer is a useful model of ion formation, not the definition of the bond. Metals and many alloys have delocalised electrons. Neither model can be assigned reliably from ΔEN alone.</p>
+<p>The simulator identifies selected named ionic solids: NaCl, KF, MgO, CaF₂ and MnI₂. Other metal–nonmetal and metalloid combinations require a specific compound and structure. Selecting two elements does not prove that a stable molecule exists.</p>
+<h3>Bond polarity is not molecular polarity</h3>
+<p>Molecular shape determines whether bond dipoles cancel. CO₂ has polar bonds but is nonpolar overall; water's bent shape gives it a net dipole. Nonpolar bonding does not by itself imply low reactivity.</p>
+<h3>References</h3>
+<ul><li><a href="https://openstax.org/books/chemistry-atoms-first/pages/4-2-covalent-bonding">OpenStax: Covalent bonding — HF and MnI₂ illustrate the limitations of cutoffs</a></li>
+<li><a href="https://goldbook.iupac.org/terms/view/IT07058">IUPAC Gold Book: Ionic bond</a></li>
+<li><a href="https://goldbook.iupac.org/terms/view/C01384">IUPAC Gold Book: Covalent bond</a></li></ul>
+<div id="bond-quiz"></div>
+</div></div>
+        <script src="periodic_table.js?v=theory2"></script>
+        <script src="element_selection.js?v=theory2"></script>
+        <script src="bond_visualization.js?v=theory2"></script>
+        <script src="educational_content.js?v=theory2"></script>
+        <script src="debug.js?v=theory2"></script>
     <script>
         function openTab(evt, tabId) {
             // Hide all tab content
